@@ -1,9 +1,10 @@
 from VentanaPrincipal import*
 from Simulador import Simulator
 
-Ancho_as_int = IntVar(value=0)
-Alto_as_int = IntVar(value=0)
+Ancho_as_int = IntVar(value=5)
+Alto_as_int = IntVar(value=5)
 NumOBS = IntVar(value=0)
+ancho = 0
 
 # --> Botón Empezar
 
