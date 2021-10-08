@@ -1,6 +1,5 @@
 from VentanaPrincipal import*
 from Mapa import*
-from EntradaSalida import*
-from Simulador import*
+from Click_Manual import*
 
 base.mainloop()
