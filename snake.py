@@ -11,10 +11,10 @@ from py_matrix import Matriz
 BLACK = (0, 0, 0)
 WHITE = (200, 200, 200)
 
-INITIAL_WINDOW_HEIGHT = 600
-INITIAL_WINDOW_WIDTH = 600
+INITIAL_WINDOW_HEIGHT = 900
+INITIAL_WINDOW_WIDTH = 900
 
-matriz_a = Matriz(10, 10)
+matriz_a = Matriz(3, 3)
 
 block_height = 0
 block_width = 0
@@ -24,7 +24,6 @@ def main():
     pygame.init()
     SCREEN = pygame.display.set_mode((INITIAL_WINDOW_WIDTH, INITIAL_WINDOW_HEIGHT), pygame.RESIZABLE)
     pygame.display.set_caption("Ventana de coche autonomo")
-    CLOCK = pygame.time.Clock()
     
 
     while True:
@@ -35,6 +34,8 @@ def main():
 
         block_height = SCREEN.get_height() // matriz_a.get_height()
         block_width = SCREEN.get_width() // matriz_a.get_width()
+
+        print(block_height, block_width)
 
         drawGrid()
         for event in pygame.event.get():
@@ -49,6 +50,10 @@ def main():
 
 
 def drawGrid():
+
+    global block_height
+    global block_width
+
     # blockSize = 5 #Set the size of the grid block
     for x in range(0, SCREEN.get_width(), block_height):
         for y in range(0, SCREEN.get_height(), block_width):
