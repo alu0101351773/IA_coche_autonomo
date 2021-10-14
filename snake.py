@@ -8,6 +8,7 @@ WHITE = (200, 200, 200)
 WINDOW_HEIGHT = 800
 WINDOW_WIDTH = 800
 
+blockSize = 40 #Set the size of the grid block
 
 def main():
     global SCREEN, CLOCK
@@ -27,11 +28,11 @@ def main():
 
 
 def drawGrid():
-    blockSize = 20 #Set the size of the grid block
+    blockSize = 40 #Set the size of the grid block
     for x in range(0, WINDOW_WIDTH, blockSize):
         for y in range(0, WINDOW_HEIGHT, blockSize):
-            rect = pygame.Rect(x, y, blockSize, blockSize)
-            pygame.draw.rect(SCREEN, BLACK, rect, 1)
+            recta = pygame.Rect(x, y, blockSize, blockSize)
+            pygame.draw.rect(SCREEN, BLACK, recta, 1)
 
 # Esto el tipo random no lo hizo
 # mal tipo random, mal
