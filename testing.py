@@ -9,9 +9,7 @@ while True:
     surface.fill((255,255,255))
 
     # Draw a red rectangle that resizes with the window.
-    pygame.draw.rect(surface, (200,0,0), (surface.get_width()/3,
-      surface.get_height()/3, surface.get_width()/3,
-      surface.get_height()/3))
+    pygame.draw.rect(surface, (200,0,0), (surface.get_width()/3, surface.get_height()/3, surface.get_width()/3, surface.get_height()/3))
 
     pygame.display.update()
     for event in pygame.event.get():
