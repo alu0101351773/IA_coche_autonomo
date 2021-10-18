@@ -1,0 +1,4 @@
+- Guardar datos matriz
+- Hacer algoritmo búsqueda
+- Visualizar recorrido 
+- Hacer leyenda 
