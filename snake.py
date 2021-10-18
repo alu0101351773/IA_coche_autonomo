@@ -1,6 +1,7 @@
 import pygame
 import sys
 from pygame.constants import RESIZABLE
+from pygame.mouse import get_pressed
 
 from py_matrix import Matriz
 
@@ -22,11 +23,11 @@ PATH_RGB = (255, 222, 84)
 
 
 # Tamaño inicial de la ventana
-INITIAL_WINDOW_HEIGHT = 900
-INITIAL_WINDOW_WIDTH = 900
+INITIAL_WINDOW_HEIGHT = 600
+INITIAL_WINDOW_WIDTH = 500
 
 # Matriz de la que partimos (por defecto)
-matriz_a = Matriz(50, 50)
+matriz_a = Matriz(46, 91)
 
 
 
@@ -52,23 +53,24 @@ def main(is_running):
                 sys.exit()
             
             # si se pulsa en la interfaz
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                x, y = pygame.mouse.get_pos()
+            x, y = pygame.mouse.get_pos()
 
-                actual_x = int( (x / block_width ) % matriz_a.get_width() )
-                actual_y = int( (y / block_height ) % matriz_a.get_height() )
-            
-                if (event.button == 1) & (matriz_a.get_value(actual_x, actual_y) == FLOOR_ID):
-                    matriz_a.set_value(actual_x, actual_y, OBSTACLE_ID)
-                    print("pinchado para colocar bloque")
+            actual_x = int( (x / block_width ) % matriz_a.get_width() )
+            actual_y = int( (y / block_height ) % matriz_a.get_height() )
 
-                if (event.button == 3) & (matriz_a.get_value(actual_x, actual_y) == OBSTACLE_ID):
-                    matriz_a.set_value(actual_x, actual_y, FLOOR_ID)
-                    print("pinchado para colocar camino")
+            # Si click izquierdo
+            if (pygame.mouse.get_pressed()[0]) & (matriz_a.get_value(actual_x, actual_y) == FLOOR_ID):
+                matriz_a.set_value(actual_x, actual_y, OBSTACLE_ID)
+                print("pinchado para colocar bloque")
 
-                #
-                # Espacio para cuando se implemente el algoritmo
-                #
+            # Si click derecho
+            if (pygame.mouse.get_pressed()[2]) & (matriz_a.get_value(actual_x, actual_y) == OBSTACLE_ID):
+                matriz_a.set_value(actual_x, actual_y, FLOOR_ID)
+                print("pinchado para colocar camino")
+
+            #
+            # Espacio para el resto de colores y cosas
+            #
 
             # Buenas practicas para cuando se redimensiona la pantalla
             if event.type == pygame.VIDEORESIZE:
