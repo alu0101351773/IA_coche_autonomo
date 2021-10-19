@@ -72,38 +72,30 @@ def Click_Manual(is_running, ancho, alto):
                 if count == 0:
                     matriz_a.set_value(actual_x, actual_y, START_ID)
                     count = count + 1
-                    print("pinchado para colocar ENTRADA")
                     break
                 if count == 1:
                     matriz_a.set_value(actual_x, actual_y, END_ID)
                     x_start = actual_x
                     y_start = actual_y
                     count = count + 1
-                    print("pinchado para colocar SALIDA")
-                    print(count)
                     break
                 if count >= 2:
                     matriz_a.set_value(actual_x, actual_y, OBSTACLE_ID)
                     count = count + 1
-                    print("pinchado para colocar OBSTÁCULO")
-                    print(count)
                     break
 
             # Si mantienes click derecho
             if (pygame.mouse.get_pressed()[2]) & (matriz_a.get_value(actual_x, actual_y) == OBSTACLE_ID):
                 matriz_a.set_value(actual_x, actual_y, FLOOR_ID)
-                print("pinchado para quitar camino")
 
             if (pygame.mouse.get_pressed()[2]) & (matriz_a.get_value(actual_x, actual_y) == START_ID):
                 matriz_a.set_value(actual_x, actual_y, FLOOR_ID)
                 count = 0
                 matriz_a.set_value(x_start, y_start, FLOOR_ID)
-                print("pinchado para quitar camino")
 
             if (pygame.mouse.get_pressed()[2]) & (matriz_a.get_value(actual_x, actual_y) == END_ID):
                 matriz_a.set_value(actual_x, actual_y, FLOOR_ID)
                 count = 1
-                print("pinchado para quitar camino")
 
             #
             # Espacio para el resto de colores y cosas
@@ -163,8 +155,6 @@ def Crear_Aleatorio(is_running, ancho, alto, porcentaje_obs):
     matriz_b = Matriz(ancho, alto)
     x = 0
 
-    print (porcentaje_obs)
-
     global SCREEN, CLOCK
     pygame.init()
     SCREEN = pygame.display.set_mode((INITIAL_WINDOW_WIDTH, INITIAL_WINDOW_HEIGHT), pygame.RESIZABLE)
@@ -180,10 +170,8 @@ def Crear_Aleatorio(is_running, ancho, alto, porcentaje_obs):
     while x < porcentaje_obs:
         x_ = random.randint(0,ancho-1)
         y_ = random.randint(0,alto-1)
-        print(x_, y_)
         if ((matriz_b.get_value(x_, y_) != OBSTACLE_ID) & (matriz_b.get_value(x_, y_) != START_ID) & (matriz_b.get_value(x_, y_) != END_ID)):
             matriz_b.set_value(x_, y_, OBSTACLE_ID)
-            print(x)
             x = x + 1
 
     while is_running:
