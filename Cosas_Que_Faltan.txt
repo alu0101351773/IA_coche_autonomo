@@ -1,3 +1,7 @@
 - Establecer límites mapa
 - Hacer que se vea el recorrido y la búsqueda paso a paso, no de golpe
 - Poner alerta de que no hay camino posible
+- Mirar bien la creación del camino (hay veces que se traba, puede que sea por los límites)
+
+OPCIONAL
+- Hacer que aumente al mover la rueda del ratón
