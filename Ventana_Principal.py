@@ -1,9 +1,8 @@
-from tkinter import*
-import tkinter as tk
+from tkinter import IntVar, StringVar, Tk, Entry, Label, Radiobutton, Button
 
-from Simulacion import *
+from Simulacion import matriz_a, Click_Manual
 
-base= tk.Tk()
+base= Tk()
 
 # --> Diseño ventana principal
 
@@ -15,10 +14,10 @@ base.config(bg="#3092CE", bd="20")
 
 # --> Variables
 
-Ancho_as_int = IntVar(value=20)
-Alto_as_int = IntVar(value=20)
+Ancho_as_int = IntVar(value=100)
+Alto_as_int = IntVar(value=100)
 NumOBS = IntVar(value=30)
-ValorOpciones = tk.IntVar(value=1)
+ValorOpciones = IntVar(value=1)
 Nombre_Fichero = StringVar(value="mapa.txt")
 Num_Dir = IntVar(value=4)
 Algoritmo = IntVar(value=1)
@@ -26,8 +25,8 @@ Algoritmo = IntVar(value=1)
 # --> Funciones
 
 def Opciones(ancho, alto):
-    aleatorio = FALSE
-    fichero = FALSE
+    aleatorio = False
+    fichero = False
     algoritmo = int(Algoritmo.get())
     direcciones = int(Num_Dir.get())
     opcion = int(ValorOpciones.get())
@@ -37,10 +36,10 @@ def Opciones(ancho, alto):
     porcentaje_obs = int(area*num_obstaculos/100)
     matriz_a.resize(alto, ancho)
     if (opcion == 1):
-        aleatorio = TRUE
+        aleatorio = True
     if (opcion == 3):
-        fichero = TRUE
-    Click_Manual(TRUE, aleatorio, fichero, porcentaje_obs, direcciones, nom_fich, algoritmo)
+        fichero = True
+    Click_Manual(True, aleatorio, fichero, porcentaje_obs, direcciones, nom_fich, algoritmo)
 
 def send_data():
     ancho = int(Ancho_as_int.get())
@@ -112,35 +111,35 @@ cuadroNum.config(fg="#FF8837", font=("Century Gothic", 12, 'bold'), justify="cen
 
 # --> Botón Opciones
 
-OpcionOB1 = tk.Radiobutton(base, text='Aleatorio', variable=ValorOpciones, value=1) 
+OpcionOB1 = Radiobutton(base, text='Aleatorio', variable=ValorOpciones, value=1) 
 OpcionOB1.config(bg="#3092CE", fg="white", font=("Century Gothic", 12, 'bold'), selectcolor = "#82C4FA", activebackground="#3092CE")
 
-OpcionOB2 = tk.Radiobutton(base, text='Manual (Click)', variable=ValorOpciones, value=2) 
+OpcionOB2 = Radiobutton(base, text='Manual (Click)', variable=ValorOpciones, value=2) 
 OpcionOB2.config(bg="#3092CE", fg="white", font=("Century Gothic", 12, 'bold'), selectcolor = "#82C4FA", activebackground="#3092CE")
 
-OpcionOB3 = tk.Radiobutton(base, text='Fichero', variable=ValorOpciones, value=3, command=Intro_Fichero) 
+OpcionOB3 = Radiobutton(base, text='Fichero', variable=ValorOpciones, value=3, command=Intro_Fichero) 
 OpcionOB3.config(bg="#3092CE", fg="white", font=("Century Gothic", 12, 'bold'), selectcolor = "#82C4FA", activebackground="#3092CE")
 
 OpcionOB1.grid(row=7, column=1, sticky="w")
 OpcionOB2.grid(row=8, column=1, sticky="w")
 OpcionOB3.grid(row=9, column=1, sticky="w")
 
-Dir_4 = tk.Radiobutton(base, text=' >>>> 4 <<<< ', variable=Num_Dir, value=4) 
+Dir_4 = Radiobutton(base, text=' >>>> 4 <<<< ', variable=Num_Dir, value=4) 
 Dir_4.config(bg="#3092CE", fg="#213B69", font=("Century Gothic", 14, 'bold'), selectcolor = "#82C4FA", activebackground="#3092CE")
 
-Dir_8 = tk.Radiobutton(base, text=' >>>> 8 <<<< ', variable=Num_Dir, value=8) 
+Dir_8 = Radiobutton(base, text=' >>>> 8 <<<< ', variable=Num_Dir, value=8) 
 Dir_8.config(bg="#3092CE", fg="#213B69", font=("Century Gothic", 14, 'bold'), selectcolor = "#82C4FA", activebackground="#3092CE")
 
 Dir_4.grid(row=4, column=0)
 Dir_8.grid(row=4, column=1)
 
-Algoritmo1 = tk.Radiobutton(base, text='Manhattan', variable=Algoritmo, value=1) 
+Algoritmo1 = Radiobutton(base, text='Manhattan', variable=Algoritmo, value=1) 
 Algoritmo1.config(bg="#3092CE", fg="white", font=("Century Gothic", 12, 'bold'), selectcolor = "#82C4FA", activebackground="#3092CE")
 
-Algoritmo2 = tk.Radiobutton(base, text='Euclidean', variable=Algoritmo, value=2) 
+Algoritmo2 = Radiobutton(base, text='Euclidean', variable=Algoritmo, value=2) 
 Algoritmo2.config(bg="#3092CE", fg="white", font=("Century Gothic", 12, 'bold'), selectcolor = "#82C4FA", activebackground="#3092CE")
 
-Algoritmo3 = tk.Radiobutton(base, text='Chebyshev', variable=Algoritmo, value=3) 
+Algoritmo3 = Radiobutton(base, text='Chebyshev', variable=Algoritmo, value=3) 
 Algoritmo3.config(bg="#3092CE", fg="white", font=("Century Gothic", 12, 'bold'), selectcolor = "#82C4FA", activebackground="#3092CE")
 
 Algoritmo1.grid(row=11, column=1, sticky="w")

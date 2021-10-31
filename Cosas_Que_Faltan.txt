@@ -1,5 +1,4 @@
 - Establecer límites mapa
-- Arreglar cuando se quita la entrada al crear mapa con fichero
 - Hacer que se vea el recorrido y la búsqueda paso a paso, no de golpe
 - Poner alerta de que no hay camino posible
 - Mirar bien la creación del camino (hay veces que se traba, puede que sea por los límites)

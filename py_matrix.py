@@ -7,7 +7,7 @@ class Matriz:
         self.inner_matrix = []
         self.height = new_height
         self.width = new_width
-
+        self.was_changed = True
         self.resize(self.height, self.width)
 
 
@@ -17,7 +17,7 @@ class Matriz:
          self.height = new_height
          self.width = new_width
 
-         self.inner_matrix = [[0 for i in range(new_height)] for j in range(new_width)]      
+         self.inner_matrix = [[0 for i in range(new_width)] for j in range(new_height)]
 
 
     # Mostrar la matriz en terminal
@@ -28,12 +28,13 @@ class Matriz:
 
     # Getter del valor en la matriz
     def get_value(self, x, y):
-        return self.inner_matrix[x][y]
+        return self.inner_matrix[y][x]
     
 
     # Setter del valor en la matriz
     def set_value(self, x, y, value):
-        self.inner_matrix[x][y] = value
+        self.inner_matrix[y][x] = value
+        self.was_changed = True
 
     
     # Getter de la anchura

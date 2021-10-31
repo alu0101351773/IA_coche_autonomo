@@ -1,5 +1,4 @@
-from math import *
-
+from math import dist
 
 class Mapa:
     def __init__(self, fil, col, lista_obst, ori =[0,0], dest = [0,0]):
@@ -9,11 +8,12 @@ class Mapa:
         self.destino = dest
         self.obstaculos = lista_obst
 
+    # Comprobar si la casilla indicada está libre
     def casilla_libre(self, fila,columna):
         pos = [fila,columna]
-        if fila < 0 or fila > self.alto:
+        if fila < 0 or fila > self.alto - 1:
             return False
-        if columna < 0 or columna > self.ancho:
+        if columna < 0 or columna > self.ancho - 1:
             return False
         for i in range(len(self.obstaculos)):
             if self.obstaculos[i] == pos:
@@ -28,9 +28,9 @@ class Nodo:
         self.padre = padre
         if algoritmo == 1:
             self.h = Manhattan(self.pos, pos_f)
-        if algoritmo == 2:
+        elif algoritmo == 2:
             self.h = Euclidean(self.pos, pos_f)
-        if algoritmo == 3:
+        elif algoritmo == 3:
             self.h = Chebyshev(self.pos, pos_f)
 
         if self.padre == None:
@@ -47,7 +47,7 @@ def Manhattan(a, b):
     return abs(a[0] - b[0]) + abs(a[1] - b[1])
 
 
-# Heurística de Euclidean
+# Heurística Euclídea
 def Euclidean(a, b):
     return dist(a,b)
 
@@ -59,7 +59,22 @@ def Chebyshev(a, b):
 
 def nodo_menor(lista):
     menor = lista[0]
-    for i in range(1,len(lista)):
+    menor_index = 0
+    # print("La lista tiene", len(lista))
+    for i in range(len(lista)):
         if lista[i].f <= menor.f:
             menor = lista[i]
-    return menor
+            menor_index = i
+    return menor, menor_index
+
+
+def is_in_set(lista, nodo, abierta):
+    for i in range(0, len(lista) - 1):
+        if nodo.pos == lista[i].pos:
+            if abierta:
+                if nodo.g >= lista[i].g:
+                    return True
+            else:
+                return True
+    
+    return False

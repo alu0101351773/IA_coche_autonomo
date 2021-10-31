@@ -1,11 +1,10 @@
-from tkinter.constants import TRUE
-import pygame
-import sys
+TRUE = 1
+
+from pygame import draw, init, display, mouse, Rect, QUIT, RESIZABLE, KEYDOWN, K_SPACE, VIDEORESIZE
+from pygame import event as Event
+from pygame import quit as Quit
+
 import random
-import time
-from pygame import draw
-from pygame.constants import RESIZABLE
-from pygame.mouse import get_pressed
 
 from py_matrix import Matriz
 from Algoritmo_A import *
@@ -40,6 +39,19 @@ INITIAL_WINDOW_WIDTH = 500
 # Matriz de la que partimos (por defecto)
 matriz_a = Matriz()
 
+def ResetGrid():
+    x = 0
+    while x < matriz_a.get_width() :
+        y = 0
+        while y < matriz_a.get_height() :
+            cell_value = matriz_a.get_value(x, y)
+            if (cell_value == ROUTE_ID) | (cell_value == CHECK_ID):
+                matriz_a.set_value(x, y, FLOOR_ID)
+
+            y += 1
+        
+        x += 1
+
 def Click_Manual(is_running, aleatorio, fichero, porcentaje_obs, direcciones, nom_fich, algoritmo):
     
     count = 0
@@ -54,10 +66,9 @@ def Click_Manual(is_running, aleatorio, fichero, porcentaje_obs, direcciones, no
     coordenada_obst = [0, 0]
 
     global SCREEN, CLOCK
-    pygame.init()
-    SCREEN = pygame.display.set_mode((INITIAL_WINDOW_WIDTH, INITIAL_WINDOW_HEIGHT), pygame.RESIZABLE)
-    pygame.display.set_caption("Ventana de coche autonomo")
-    CLOCK = pygame.time.Clock()     # Creo que es necesario para funciones del sistema
+    init()
+    SCREEN = display.set_mode((INITIAL_WINDOW_WIDTH, INITIAL_WINDOW_HEIGHT), RESIZABLE)
+    display.set_caption("Ventana de coche autonomo")
     
     if aleatorio == TRUE:
         count = 2
@@ -134,27 +145,34 @@ def Click_Manual(is_running, aleatorio, fichero, porcentaje_obs, direcciones, no
     while is_running:
         SCREEN.fill(FLOOR_RGB)
 
-        drawGrid()
-        pygame.display.update()
+        
+        if matriz_a.was_changed == True:
+            drawGrid()
+            matriz_a.was_changed = False
+            print("Impreso")
+            display.update()
 
-        for event in pygame.event.get():
+        for event in Event.get():
             
             # Si se cierra el programa
-            if event.type == pygame.QUIT:
-                pygame.quit()
+            if event.type == QUIT:
+                Quit()
 
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
+            if event.type == KEYDOWN:
+                if event.key == K_SPACE:
+                    ResetGrid()
                     Crear_Simulacion(start, end, lista_obst, direcciones, algoritmo)
             
             # Si se pulsa en la interfaz
-            x, y = pygame.mouse.get_pos()
+            x, y = mouse.get_pos()
 
             actual_x = int((x / block_width) % matriz_a.get_width())
             actual_y = int((y / block_height) % matriz_a.get_height())
 
             # Si mantienes click izquierdo
-            if (pygame.mouse.get_pressed()[0]) & (matriz_a.get_value(actual_x, actual_y) == FLOOR_ID):
+            if (mouse.get_pressed()[0]) & ((matriz_a.get_value(actual_x, actual_y) == FLOOR_ID)
+                                               | (matriz_a.get_value(actual_x, actual_y) == ROUTE_ID)
+                                               | (matriz_a.get_value(actual_x, actual_y) == CHECK_ID)):
                 if count == 0:
                     matriz_a.set_value(actual_x, actual_y, START_ID)
                     start = [actual_x, actual_y]
@@ -177,18 +195,18 @@ def Click_Manual(is_running, aleatorio, fichero, porcentaje_obs, direcciones, no
                     break
 
             # Si mantienes click derecho
-            if (pygame.mouse.get_pressed()[2]) & (matriz_a.get_value(actual_x, actual_y) == OBSTACLE_ID):
+            if (mouse.get_pressed()[2]) & (matriz_a.get_value(actual_x, actual_y) == OBSTACLE_ID):
                 lista_obst.pop(lista_obst.index([actual_x, actual_y]))
                 matriz_a.set_value(actual_x, actual_y, FLOOR_ID)
 
-            if (pygame.mouse.get_pressed()[2]) & (matriz_a.get_value(actual_x, actual_y) == START_ID):
+            if (mouse.get_pressed()[2]) & (matriz_a.get_value(actual_x, actual_y) == START_ID):
                 matriz_a.set_value(actual_x, actual_y, FLOOR_ID)
                 start = [actual_x, actual_y]
                 matriz_a.set_value(x_end, y_end, FLOOR_ID)
                 end = [x_end, y_end]
                 count = 0
 
-            if (pygame.mouse.get_pressed()[2]) & (matriz_a.get_value(actual_x, actual_y) == END_ID):
+            if (mouse.get_pressed()[2]) & (matriz_a.get_value(actual_x, actual_y) == END_ID):
                 matriz_a.set_value(actual_x, actual_y, FLOOR_ID)
                 end = [actual_x, actual_y]
                 count = 1
@@ -198,8 +216,9 @@ def Click_Manual(is_running, aleatorio, fichero, porcentaje_obs, direcciones, no
             #
 
             # Buenas practicas para cuando se redimensiona la pantalla
-            if event.type == pygame.VIDEORESIZE:
-                SCREEN = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
+            if event.type == VIDEORESIZE:
+                matriz_a.was_changed = True
+                SCREEN = display.set_mode((event.w, event.h), RESIZABLE)
 
         
 
@@ -219,124 +238,119 @@ def drawGrid():
         while y < SCREEN.get_height():
             auxiliar_y = round(y / block_height ) % matriz_a.get_height() 
 
-            rect = pygame.Rect(x, y, block_width, block_height)
+            rect = Rect(x, y, block_width, block_height)
 
             cell_value = matriz_a.get_value(auxiliar_x, auxiliar_y)
             if cell_value == FLOOR_ID :
-                pygame.draw.rect(SCREEN, OBSTACLE_RGB, rect, 1)
+                draw.rect(SCREEN, OBSTACLE_RGB, rect, 1)
 
             elif cell_value == OBSTACLE_ID:
-                pygame.draw.rect(SCREEN, OBSTACLE_RGB, rect, 0)
+                draw.rect(SCREEN, OBSTACLE_RGB, rect, 0)
 
             elif cell_value == START_ID:
-                pygame.draw.rect(SCREEN, START_RGB, rect, 0)
+                draw.rect(SCREEN, START_RGB, rect, 0)
 
             elif cell_value == PATH_ID:
-                pygame.draw.rect(SCREEN, PATH_RGB, rect, 0)
+                draw.rect(SCREEN, PATH_RGB, rect, 0)
             
             elif cell_value == END_ID:
-                pygame.draw.rect(SCREEN, END_RGB, rect, 0)
+                draw.rect(SCREEN, END_RGB, rect, 0)
             
             elif cell_value == ROUTE_ID:
-                pygame.draw.rect(SCREEN, ROUTE_RGB, rect, 0)
+                draw.rect(SCREEN, ROUTE_RGB, rect, 0)
             
             elif cell_value == CHECK_ID:
-                pygame.draw.rect(SCREEN, CHECK_RGB, rect, 0)
+                draw.rect(SCREEN, CHECK_RGB, rect, 0)
 
             y += block_height
         x += block_width
 
 
 def Crear_Simulacion(start, end, lista_obst, direcciones, algoritmo):
+    import time
+    start_time = time.time()
+    
     map = Mapa(matriz_a.get_height(), matriz_a.get_width(), lista_obst, start, end)
     abiertos = []
     cerrados = []
-    abiertos.append(Nodo(map.destino,map.origen))
-    while nodo_menor(abiertos).pos != map.destino:
-        menor = nodo_menor(abiertos)
-        abiertos.remove(menor)
-        if direcciones == 4:
-            gen_hijos_4(map, abiertos, menor, algoritmo)
-        if direcciones == 8:
-            gen_hijos_8(map, abiertos, menor, algoritmo)
-        cerrados.append(menor)
-    casilla = nodo_menor(abiertos)
+    abiertos.append(Nodo(end, start))
     camino = []
-    while True:
-        camino.append(casilla.pos)
-        if casilla.padre == None:
+    sol = False
+    while len(abiertos) > 0:
+        menor, index = nodo_menor(abiertos)
+        abiertos.pop(index)
+        cerrados.append(menor)
+        if menor.pos == end:
+            while menor != None:
+                camino.append(menor.pos)
+                menor = menor.padre
+            sol = True
             break
-        casilla = casilla.padre
+
+        if direcciones == 4:
+            gen_hijos_4(map, abiertos, cerrados, menor, algoritmo)
+        if direcciones == 8:
+            gen_hijos_8(map, abiertos, cerrados, menor, algoritmo)
+
+    end_time = time.time()
+    if not sol:
+        print("NO SOLUTION")
     for i in range(len(camino)-2):
         x_, y_ = camino[i+1]
-        matriz_a.set_value(x_, y_, ROUTE_ID)   
-
-
-def gen_hijos_4(map, lista, padre, algoritmo):
-    # Arriba
-    if map.casilla_libre(padre.pos[0] - 1,padre.pos[1]):
-        lista.append(Nodo(map.destino,[padre.pos[0] - 1,padre.pos[1]],padre, algoritmo))
-        if (matriz_a.get_value(padre.pos[0] - 1, padre.pos[1]) != START_ID) & (matriz_a.get_value(padre.pos[0] - 1, padre.pos[1]) != END_ID):
-            matriz_a.set_value(padre.pos[0] - 1, padre.pos[1], CHECK_ID)
-    # Abajo
-    if map.casilla_libre(padre.pos[0] + 1,padre.pos[1]):
-        lista.append(Nodo(map.destino,[padre.pos[0] + 1,padre.pos[1]],padre, algoritmo))
-        if (matriz_a.get_value(padre.pos[0] + 1, padre.pos[1]) != START_ID) & (matriz_a.get_value(padre.pos[0] + 1, padre.pos[1]) != END_ID): 
-            matriz_a.set_value(padre.pos[0] + 1, padre.pos[1], CHECK_ID)
-    #Izquierda
-    if map.casilla_libre(padre.pos[0],padre.pos[1] - 1):
-        lista.append(Nodo(map.destino,[padre.pos[0],padre.pos[1] - 1],padre, algoritmo))
-        if (matriz_a.get_value(padre.pos[0], padre.pos[1] - 1) != START_ID) & (matriz_a.get_value(padre.pos[0], padre.pos[1] - 1) != END_ID): 
-            matriz_a.set_value(padre.pos[0], padre.pos[1] - 1, CHECK_ID)
-    #Derecha
-    if map.casilla_libre(padre.pos[0],padre.pos[1] + 1):
-        lista.append(Nodo(map.destino,[padre.pos[0],padre.pos[1] + 1],padre, algoritmo))
-        if (matriz_a.get_value(padre.pos[0], padre.pos[1] + 1) != START_ID) & (matriz_a.get_value(padre.pos[0], padre.pos[1] + 1) != END_ID): 
-            matriz_a.set_value(padre.pos[0], padre.pos[1] + 1, CHECK_ID)
-
-def gen_hijos_8(map, lista, padre, algoritmo):
-    # Arriba
-    if map.casilla_libre(padre.pos[0] - 1,padre.pos[1]):
-        lista.append(Nodo(map.destino,[padre.pos[0] - 1,padre.pos[1]],padre, algoritmo))
-        if (matriz_a.get_value(padre.pos[0] - 1, padre.pos[1]) != START_ID) & (matriz_a.get_value(padre.pos[0] - 1, padre.pos[1]) != END_ID):
-            matriz_a.set_value(padre.pos[0] - 1, padre.pos[1], CHECK_ID)
-    # Abajo
-    if map.casilla_libre(padre.pos[0] + 1,padre.pos[1]):
-        lista.append(Nodo(map.destino,[padre.pos[0] + 1,padre.pos[1]],padre, algoritmo))
-        if (matriz_a.get_value(padre.pos[0] + 1, padre.pos[1]) != START_ID) & (matriz_a.get_value(padre.pos[0] + 1, padre.pos[1]) != END_ID): 
-            matriz_a.set_value(padre.pos[0] + 1, padre.pos[1], CHECK_ID)
-    #Izquierda
-    if map.casilla_libre(padre.pos[0],padre.pos[1] - 1):
-        lista.append(Nodo(map.destino,[padre.pos[0],padre.pos[1] - 1],padre, algoritmo))
-        if (matriz_a.get_value(padre.pos[0], padre.pos[1] - 1) != START_ID) & (matriz_a.get_value(padre.pos[0], padre.pos[1] - 1) != END_ID): 
-            matriz_a.set_value(padre.pos[0], padre.pos[1] - 1, CHECK_ID)
-    #Derecha
-    if map.casilla_libre(padre.pos[0],padre.pos[1] + 1):
-        lista.append(Nodo(map.destino,[padre.pos[0],padre.pos[1] + 1],padre, algoritmo))
-        if (matriz_a.get_value(padre.pos[0], padre.pos[1] + 1) != START_ID) & (matriz_a.get_value(padre.pos[0], padre.pos[1] + 1) != END_ID): 
-            matriz_a.set_value(padre.pos[0], padre.pos[1] + 1, CHECK_ID)
-    # Arriba-Izquierda
-    if map.casilla_libre(padre.pos[0] - 1,padre.pos[1] - 1):
-        lista.append(Nodo(map.destino,[padre.pos[0] - 1,padre.pos[1] - 1],padre, algoritmo))
-        if (matriz_a.get_value(padre.pos[0] - 1, padre.pos[1] - 1) != START_ID) & (matriz_a.get_value(padre.pos[0] - 1, padre.pos[1] - 1) != END_ID): 
-           matriz_a.set_value(padre.pos[0] - 1, padre.pos[1] - 1, CHECK_ID)
-    # Arriba-Derecha
-    if map.casilla_libre(padre.pos[0] - 1,padre.pos[1] + 1):
-        lista.append(Nodo(map.destino,[padre.pos[0] - 1,padre.pos[1] + 1],padre, algoritmo))
-        if (matriz_a.get_value(padre.pos[0] - 1, padre.pos[1] + 1) != START_ID) & (matriz_a.get_value(padre.pos[0] - 1, padre.pos[1] + 1) != END_ID): 
-           matriz_a.set_value(padre.pos[0] - 1, padre.pos[1] + 1, CHECK_ID)
-    # Abajo-Izquierda
-    if map.casilla_libre(padre.pos[0] + 1,padre.pos[1] - 1):
-        lista.append(Nodo(map.destino,[padre.pos[0] + 1,padre.pos[1] - 1],padre, algoritmo))
-        if (matriz_a.get_value(padre.pos[0] + 1, padre.pos[1] - 1) != START_ID) & (matriz_a.get_value(padre.pos[0] + 1, padre.pos[1] - 1) != END_ID): 
-           matriz_a.set_value(padre.pos[0] + 1, padre.pos[1] - 1, CHECK_ID)
-    # Abajo-Derecha
-    if map.casilla_libre(padre.pos[0] + 1,padre.pos[1] + 1):
-        lista.append(Nodo(map.destino,[padre.pos[0] + 1,padre.pos[1] + 1],padre, algoritmo))
-        if (matriz_a.get_value(padre.pos[0] + 1, padre.pos[1] + 1) != START_ID) & (matriz_a.get_value(padre.pos[0] + 1, padre.pos[1] + 1) != END_ID): 
-           matriz_a.set_value(padre.pos[0] + 1, padre.pos[1] + 1, CHECK_ID)
-
-
-
-
+        matriz_a.set_value(x_, y_, ROUTE_ID)
     
+    print(end_time - start_time)
+
+
+def gen_hijos_4(map, lista_abierta, lista_cerrada ,padre, algoritmo):
+    # Arriba
+    if map.casilla_libre(padre.pos[0] - 1,padre.pos[1]) and not is_in_set(lista_cerrada, Nodo(map.destino,[padre.pos[0] - 1,padre.pos[1]],padre, algoritmo), 0):
+        if not is_in_set(lista_abierta, padre, 1):
+            lista_abierta.append(Nodo(map.destino,[padre.pos[0] - 1,padre.pos[1]],padre, algoritmo))
+            # if (matriz_a.get_value(padre.pos[0] - 1, padre.pos[1]) != START_ID) & (matriz_a.get_value(padre.pos[0] - 1, padre.pos[1]) != END_ID):
+            #     matriz_a.set_value(padre.pos[0] - 1, padre.pos[1], CHECK_ID)
+    # Abajo
+    if map.casilla_libre(padre.pos[0] + 1,padre.pos[1]) and not is_in_set(lista_cerrada, Nodo(map.destino,[padre.pos[0] + 1,padre.pos[1]],padre, algoritmo), 0):
+        if not is_in_set(lista_abierta, padre, 1):
+            lista_abierta.append(Nodo(map.destino,[padre.pos[0] + 1,padre.pos[1]],padre, algoritmo))
+            # if (matriz_a.get_value(padre.pos[0] + 1, padre.pos[1]) != START_ID) & (matriz_a.get_value(padre.pos[0] + 1, padre.pos[1]) != END_ID): 
+            #     matriz_a.set_value(padre.pos[0] + 1, padre.pos[1], CHECK_ID)
+    #Izquierda
+    if map.casilla_libre(padre.pos[0],padre.pos[1] - 1) and not is_in_set(lista_cerrada, Nodo(map.destino,[padre.pos[0] ,padre.pos[1] - 1],padre, algoritmo), 0):
+        if not is_in_set(lista_abierta, padre, 1):
+            lista_abierta.append(Nodo(map.destino,[padre.pos[0],padre.pos[1] - 1],padre, algoritmo))
+            # if (matriz_a.get_value(padre.pos[0], padre.pos[1] - 1) != START_ID) & (matriz_a.get_value(padre.pos[0], padre.pos[1] - 1) != END_ID): 
+            #     matriz_a.set_value(padre.pos[0], padre.pos[1] - 1, CHECK_ID)
+    #Derecha
+    if map.casilla_libre(padre.pos[0],padre.pos[1] + 1) and not is_in_set(lista_cerrada, Nodo(map.destino,[padre.pos[0],padre.pos[1] + 1],padre, algoritmo), 0):
+        if not is_in_set(lista_abierta, padre, 1):
+            lista_abierta.append(Nodo(map.destino,[padre.pos[0],padre.pos[1] + 1],padre, algoritmo))
+            # if (matriz_a.get_value(padre.pos[0], padre.pos[1] + 1) != START_ID) & (matriz_a.get_value(padre.pos[0], padre.pos[1] + 1) != END_ID): 
+            #     matriz_a.set_value(padre.pos[0], padre.pos[1] + 1, CHECK_ID)
+
+def gen_hijos_8(map, lista_abierta, lista_cerrada, padre, algoritmo):
+    gen_hijos_4(map, lista_abierta, lista_cerrada, padre, algoritmo)
+    # Arriba-Izquierda
+    if map.casilla_libre(padre.pos[0] - 1,padre.pos[1] - 1) and not is_in_set(lista_cerrada, Nodo(map.destino,[padre.pos[0] - 1,padre.pos[1] - 1],padre, algoritmo), 0):
+        if not is_in_set(lista_abierta, padre, 1):
+            lista_abierta.append(Nodo(map.destino,[padre.pos[0] - 1,padre.pos[1] - 1],padre, algoritmo))
+            # if (matriz_a.get_value(padre.pos[0] - 1, padre.pos[1] - 1) != START_ID) & (matriz_a.get_value(padre.pos[0] - 1, padre.pos[1] - 1) != END_ID): 
+            #     matriz_a.set_value(padre.pos[0] - 1, padre.pos[1] - 1, CHECK_ID)
+    # Arriba-Derecha
+    if map.casilla_libre(padre.pos[0] - 1,padre.pos[1] + 1) and not is_in_set(lista_cerrada, Nodo(map.destino,[padre.pos[0] - 1,padre.pos[1] + 1],padre, algoritmo), 0):
+        if not is_in_set(lista_abierta, padre, 1):
+            lista_abierta.append(Nodo(map.destino,[padre.pos[0] - 1,padre.pos[1] + 1],padre, algoritmo))
+            # if (matriz_a.get_value(padre.pos[0] - 1, padre.pos[1] + 1) != START_ID) & (matriz_a.get_value(padre.pos[0] - 1, padre.pos[1] + 1) != END_ID): 
+            #     matriz_a.set_value(padre.pos[0] - 1, padre.pos[1] + 1, CHECK_ID)
+    # Abajo-Izquierda
+    if map.casilla_libre(padre.pos[0] + 1,padre.pos[1] - 1) and not is_in_set(lista_cerrada, Nodo(map.destino,[padre.pos[0] + 1,padre.pos[1] - 1],padre, algoritmo), 0):
+        if not is_in_set(lista_abierta, padre, 1):
+            lista_abierta.append(Nodo(map.destino,[padre.pos[0] + 1,padre.pos[1] - 1],padre, algoritmo))
+            # if (matriz_a.get_value(padre.pos[0] + 1, padre.pos[1] - 1) != START_ID) & (matriz_a.get_value(padre.pos[0] + 1, padre.pos[1] - 1) != END_ID): 
+            #     matriz_a.set_value(padre.pos[0] + 1, padre.pos[1] - 1, CHECK_ID)
+    # Abajo-Derecha
+    if map.casilla_libre(padre.pos[0] + 1,padre.pos[1] + 1) and not is_in_set(lista_cerrada, Nodo(map.destino,[padre.pos[0] + 1,padre.pos[1] + 1],padre, algoritmo), 0):
+        if not is_in_set(lista_abierta, padre, 1):
+            lista_abierta.append(Nodo(map.destino,[padre.pos[0] + 1,padre.pos[1] + 1],padre, algoritmo))
+            # if (matriz_a.get_value(padre.pos[0] + 1, padre.pos[1] + 1) != START_ID) & (matriz_a.get_value(padre.pos[0] + 1, padre.pos[1] + 1) != END_ID): 
+            #     matriz_a.set_value(padre.pos[0] + 1, padre.pos[1] + 1, CHECK_ID)
